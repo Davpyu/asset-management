@@ -39,9 +39,12 @@ class AuthController extends Controller
             'address'       => $request->alamat,
             'role'          => $role
         ]);
-        Auth::login($user);
-        $token = $user->createToken('api-login');
-        return $this->responseWithToken($token->plainTextToken, $user->role);
+        if (!Auth::check() && !Auth::user()->isAdmin()) {
+            Auth::login($user);
+            $token = $user->createToken('api-login');
+            return $this->responseWithToken($token->plainTextToken, $user->role);
+        }
+        return $this->responseSuccess('Admin created');
     }
 
     public function forgot(ForgotPasswordRequest $request)
